@@ -1,0 +1,185 @@
+body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.textbackground {
+  position: absolute;
+  text-align: center;
+  z-index: -1;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+}
+
+.item {
+  margin: 0px;
+}
+
+.flip {
+  animation: animate 2s linear infinite;
+}
+
+.flip2 {
+  animation: animate2 2.1s linear infinite;
+}
+
+.flip3 {
+  animation: animate3 2.2s linear infinite;
+}
+
+.flip3r {
+  transform: rotateY(180deg);
+  animation: animate3r 2.2s linear infinite;
+}
+
+.flip2r {
+  transform: rotateY(180deg);
+  animation: animate2r 2.1s linear infinite;
+}
+
+.flipr {
+  transform: rotateY(180deg);
+  animation: animater 2s linear infinite;
+}
+
+@keyframes animate {
+  0% {
+    transform:
+      rotateX(0deg) rotateY(0deg);
+  }
+
+  100% {
+    transform:
+      rotateX(0deg) rotateY(360deg);
+  }
+}
+
+@keyframes animate2 {
+  0% {
+    transform:
+      rotateX(0deg) rotateY(0deg);
+  }
+
+  100% {
+    transform:
+      rotateX(0deg) rotateY(360deg);
+  }
+}
+
+@keyframes animate3 {
+  0% {
+    transform:
+      rotateX(0deg) rotateY(0deg);
+  }
+
+  100% {
+    transform:
+      rotateX(0deg) rotateY(360deg);
+  }
+}
+
+@keyframes animate3r {
+  0% {
+    transform:
+      rotateX(0deg) rotateY(180deg);
+  }
+
+  100% {
+    transform:
+      rotateX(0deg) rotateY(-180deg);
+  }
+}
+
+@keyframes animate2r {
+  0% {
+    transform:
+      rotateX(0deg) rotateY(180deg);
+  }
+
+  100% {
+    transform:
+      rotateX(0deg) rotateY(-180deg);
+  }
+}
+
+@keyframes animater {
+  0% {
+    transform:
+      rotateX(0deg) rotateY(180deg);
+  }
+
+  100% {
+    transform:
+      rotateX(0deg) rotateY(-180deg);
+  }
+}
+
+.rotate45 {
+  transform: rotateX(45deg);
+}
+
+.list_container {
+  direction: rtl;
+  transform: rotateY(0deg) rotate(22.5deg);
+  overflow: auto;
+  height: 150px;
+  width: 35px;
+}
+
+.list_container2 {
+  direction: rtl;
+  transform: rotateY(0deg) rotate(11.25deg);
+  overflow: auto;
+  height: 200px;
+  width: 35px;
+}
+
+.list_container3 {
+  direction: rtl;
+  overflow: auto;
+  height: 250px;
+  width: 35px;
+}
+
+.item_direction {
+  direction: rtl;
+}
+
+.list_container_r3 {
+  direction: ltr;
+  overflow: auto;
+  height: 250px;
+  width: 35px;
+}
+
+.list_container_r2 {
+  direction: ltr;
+  transform: rotateY(0deg) rotate(-11.25deg);
+  overflow: auto;
+  height: 200px;
+  width: 35px;
+}
+
+.list_container_r {
+  direction: ltr;
+  transform: rotateY(0deg) rotate(-22.5deg);
+  overflow: auto;
+  height: 150px;
+  width: 35px;
+}
+
+.item_direction_r {
+  direction: ltr;
+}
+
+.flip_eyebrow225l {
+  transform: rotateY(0deg) rotate(-22.5deg);
+}
+
+.flip_eyebrow225r {
+  transform: rotateY(0deg) rotate(22.5deg);
+}
