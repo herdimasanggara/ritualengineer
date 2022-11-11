@@ -379,7 +379,7 @@ function Ant(ants) {
     this.div.css(newcss);
     this.img = $("#ant" + ants.i + "_" + this.i + " > img");
     this.dirchange = Math.random() * 0.2;
-    this.speed = {base: 4.5 + Math.random()};
+    this.speed = {base: 7.5 + Math.random()};
     this.turna(this.dir);
     this.lastchange = 0;
     this.fast = 0;
