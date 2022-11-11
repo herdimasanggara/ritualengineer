@@ -47,7 +47,7 @@ var imgdir = ["%s_finder01.gif",
 
 var imgdirbase = window.location.protocol + "//ritual.engineer/";
 
-var imageSize = 13;
+var imageSize = 5;
 var ishr = Math.sqrt(imageSize) / 2;
 //var foodDistance = 50;
 
