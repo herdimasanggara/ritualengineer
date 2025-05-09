@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ITALIK</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: white;
+      font-family: sans-serif;
+    }
+
+    .radio-grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 16px);
+      grid-template-rows: repeat(auto-fill, 16px);
+      gap: 0;
+      z-index: 0;
+    }
+
+    .radio-grid input[type="radio"] {
+      display: block;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+      border: 0;
+      pointer-events: auto;
+      box-sizing: border-box;
+    }
+
+    .iframe-wrapper {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      max-width: 800px;
+      height: 100vh;
+      z-index: 1;
+      transition: transform 0.4s ease-in-out;
+      pointer-events: auto;
+    }
+
+    iframe {
+      border: none;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="radio-grid" id="radioGrid"></div>
+
+  <div class="iframe-wrapper" id="iframeWrapper">
+    <iframe src="https://docs.google.com/document/d/e/2PACX-1vTiL-wo384RW5bHu8jArJh6wJQQFvJeZU95z81Qapc7c32QsYWk5xhK0NhNa9AR6GNDXql1KQIPm0lg/pub?embedded=true"></iframe>
+  </div>
+
+  <script>
+    const iframeWrapper = document.getElementById('iframeWrapper');
+    const radioGrid = document.getElementById('radioGrid');
+    let shaking = true;
+    let currentRotation = 0;
+  
+    function createGridButtons() {
+      radioGrid.innerHTML = '';
+  
+      const cols = Math.ceil(window.innerWidth / 16);
+      const rows = Math.ceil(window.innerHeight / 16);
+      const total = cols * rows;
+  
+      const shakeMap = Array(total).fill(true).map((_, i) => i < total / 2);
+      shakeMap.sort(() => Math.random() - 0.5);
+  
+      for (let i = 0; i < total; i++) {
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'chaos';
+        input.title = shakeMap[i] ? 'Shake ON' : 'Shake OFF';
+  
+        input.addEventListener('click', () => {
+          shaking = shakeMap[i];
+        });
+  
+        radioGrid.appendChild(input);
+      }
+    }
+  
+    window.addEventListener('resize', createGridButtons);
+    createGridButtons();
+  
+    function rotateIframe() {
+      if (shaking) {
+        const delta = (Math.random() * (3 - 0.5) + 0.5) * (Math.random() < 0.5 ? -1 : 1);
+        currentRotation += delta;
+        iframeWrapper.style.transform = `translate(-50%, -50%) rotate(${currentRotation.toFixed(2)}deg)`;
+      }
+    }
+  
+    setInterval(rotateIframe, 500);
+  </script>
+  
+</body>
+</html>
