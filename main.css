@@ -1,23 +1,7 @@
-html, body {
+body {
+  overflow-x: hidden;
   margin: 0;
   padding: 0;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.video-wrapper {
-  width: 960px;
-  max-width: 90vw;
-  aspect-ratio: 16 / 9;
-}
-
-iframe {
-  width: 80%;
-  height: 100%;
-  border: none;
 }
 
 a:visited {
