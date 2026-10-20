@@ -1,7 +1,7 @@
 (function () {
   var CYCLE = 10000;
   var SHOW_AT = 5000;
-  var BOTTOM = "24px";
+  var BOTTOM = 24;
 
   var PAGES = [
     { slug: "",                 name: "Herdimas Anggara"  },
@@ -238,18 +238,24 @@
     } }
   ];
 
+  function view() {
+    var v = window.visualViewport;
+    if (v) return { x: v.offsetLeft, y: v.offsetTop, w: v.width, h: v.height };
+    return { x: 0, y: 0, w: document.documentElement.clientWidth, h: innerHeight };
+  }
+
   function show() {
     var css = el("style");
     css.textContent =
-      "#doyoumean{position:fixed;left:0;right:0;bottom:" + BOTTOM + ";z-index:2147483647;pointer-events:none;" +
-      "font-family:'Times New Roman',Times,serif;font-size:medium}" +
-      "#doyoumean>div{position:relative;margin:0 auto;pointer-events:auto;cursor:pointer}" +
+      "#doyoumean{position:fixed;left:0;top:0;width:0;height:0;overflow:visible;z-index:2147483647;pointer-events:none;" +
+      "font-family:'Times New Roman',Times,serif;font-size:medium;-webkit-text-size-adjust:100%;text-size-adjust:100%}" +
+      "#doyoumean>div{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:auto;cursor:pointer}" +
       "#doyoumean *{font-family:inherit;font-size:inherit;white-space:nowrap}";
     document.head.appendChild(css);
 
     var layer = el("div", { id: "doyoumean" });
     var ask = ASK[here];
-    var W = Math.min(ask.w || 640, innerWidth - 32), H = ask.h;
+    var W = ask.w || 640, H = ask.h;
     var stage = el("div");
     stage.style.width = W + "px";
     stage.style.height = H + "px";
@@ -258,7 +264,30 @@
     stage.addEventListener("click", function (e) { e.preventDefault(); go(); });
 
     var tick = ask.draw(stage, W, H);
-    if (tick) (function loop() { tick(progress()); requestAnimationFrame(loop); })();
+
+    var sr = stage.getBoundingClientRect(), bx = Infinity, by = Infinity, bx2 = -Infinity, by2 = -Infinity;
+    stage.querySelectorAll("*").forEach(function (e) {
+      if (e.parentNode !== stage) return;
+      var r = e.getBoundingClientRect();
+      bx = Math.min(bx, r.left - sr.left); by = Math.min(by, r.top - sr.top);
+      bx2 = Math.max(bx2, r.right - sr.left); by2 = Math.max(by2, r.bottom - sr.top);
+    });
+    var bw = bx2 - bx, bh = by2 - by;
+
+    var last = "";
+    function place() {
+      var v = view();
+      var s = Math.min(1, (v.w - 16) / bw, (v.h * 0.6) / bh);
+      var x = v.x + (v.w - bw * s) / 2 - bx * s;
+      var y = v.y + v.h - BOTTOM - by2 * s;
+      var t = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) scale(" + s.toFixed(4) + ")";
+      if (t !== last) { stage.style.transform = t; last = t; }
+    }
+    (function loop() {
+      place();
+      if (tick) tick(progress());
+      requestAnimationFrame(loop);
+    })();
   }
 
   setTimeout(show, SHOW_AT);
