@@ -4,27 +4,35 @@
   var BOTTOM = 24;
 
   var PAGES = [
-    { slug: "",                 name: "Herdimas Anggara"  },
-    { slug: "herdimasangarra",  name: "Herdimas Angarra"  },
-    { slug: "herdimasanggarra", name: "Herdimas Anggarra" },
-    { slug: "herdinasanggara",  name: "Herdinas Anggara"  },
-    { slug: "hermidasanggara",  name: "Hermidas Anggara"  },
-    { slug: "herrdimasanggara", name: "Herrdimas Anggara" }
+    { url: "https://webresidencies.akademie-solitude.de/racun", file: "index", name: "Herdimas Anggara"  },
+    { url: "https://ritual.engineer/herdimasangarra",            file: "rucan", name: "Herdimas Angarra"  },
+    { url: "https://ritual.engineer/herdimasanggarra",           file: "carun", name: "Herdimas Anggarra" },
+    { url: "https://ritual.engineer/herdinasanggara",            file: "curan", name: "Herdinas Anggara"  },
+    { url: "https://ritual.engineer/hermidasanggara",            file: "nacur", name: "Hermidas Anggara"  },
+    { url: "https://ritual.engineer/herrdimasanggara",           file: "canur", name: "Herrdimas Anggara" }
   ];
 
   var local = location.protocol === "file:";
-  var last = location.pathname.split("/").pop().replace(/\.html?$/i, "").toLowerCase();
-  if (last === "index") last = "";
+  var segs = location.pathname.toLowerCase().split("/").filter(Boolean).map(function (x) { return x.replace(/\.html?$/, ""); });
+  if (segs.length > 1 && segs[segs.length - 1] === "index") segs.pop();
+  var last = segs.pop() || "";
   var here = 0;
-  for (var i = 0; i < PAGES.length; i++) if (PAGES[i].slug === last) here = i;
+  for (var i = 0; i < PAGES.length; i++) {
+    var slug = PAGES[i].url.split("/").pop();
+    if (PAGES[i].file === last || (slug === last && location.hostname === PAGES[i].url.split("/")[2])) here = i;
+  }
   var there = (here + 1) % PAGES.length;
 
-  function urlFor(p) { return local ? (p.slug || "index") + ".html" : "/" + p.slug; }
+  function urlFor(p) { return local ? p.file + ".html" : p.url; }
   var NEXT = urlFor(PAGES[there]);
   var stay = /[?&]stay\b/.test(location.search);
   var t0 = Date.now();
 
-  function go() { location.replace(NEXT); }
+  function go() {
+    var w = window;
+    try { if (window.top && window.top.location.href) w = window.top; } catch (e) { w = window; }
+    try { w.location.replace(NEXT); } catch (e) { location.replace(NEXT); }
+  }
   function progress() { return Math.max(0, Math.min(1, (Date.now() - t0 - SHOW_AT) / (CYCLE - SHOW_AT))); }
   function step(f, n) { return Math.min(n - 1, Math.floor(f * n)); }
 
@@ -151,27 +159,46 @@
       };
     } },
 
-    { h: 120, w: 880, draw: function (st, W, H) {
-      var q = ("Do you mean " + TO + "?").replace(/ /g, "");
-      var off = "Doyoumean".length, nameNoSpace = TO.replace(/ /g, ""), diffNoSpace = [];
-      for (var k = 0, j = 0; k < TO.length; k++) if (TO[k] !== " ") diffNoSpace[j++] = DIFF[k];
+    { h: 120, w: 880, narrow: { h: 170, w: 240 }, draw: function (st, W, H) {
       var pending = [];
-      var tiles = q.split("").map(function (ch, k) {
+      function tile(ch, isNew) {
         var b = el("button", { type: "button" });
-        var ni = k - off;
-        if (ni >= 0 && ni < nameNoSpace.length && diffNoSpace[ni]) {
-          var inner = el("i", {}, ["�"]);
+        if (isNew) {
+          var inner = el("i", {}, ["\uFFFD"]);
           b.appendChild(el("b", {}, [inner]));
           pending.push({ e: inner, ch: ch });
         } else b.appendChild(document.createTextNode(ch));
         return b;
-      });
-      function wave(dy) {
-        return function (t) { return { x: 20 + t * (W - 40), y: 40 + dy + Math.sin(t * Math.PI * 3) * 18 }; };
       }
-      along(st, tiles, wave(0), 2, false);
-      var sw = many(Math.ceil(tiles.length / 2.4), function () { return el("input", { type: "color", value: "#0000ff" }); });
-      along(st, sw, wave(54), 2, false);
+      function wave(dy, amp, periods, phase) {
+        return function (t) { return { x: 12 + t * (W - 24), y: dy + Math.sin(t * Math.PI * 2 * periods + phase) * amp }; };
+      }
+      var names = TO.split(" ");
+      if (W > 400) {
+        var q = ("Do you mean " + TO + "?").replace(/ /g, ""), off = "Doyoumean".length, diffNoSpace = [];
+        for (var k = 0, j = 0; k < TO.length; k++) if (TO[k] !== " ") diffNoSpace[j++] = DIFF[k];
+        var tiles = q.split("").map(function (ch, k) {
+          var ni = k - off;
+          return tile(ch, ni >= 0 && ni < diffNoSpace.length && diffNoSpace[ni]);
+        });
+        along(st, tiles, wave(40, 18, 1.5, 0), 2, false);
+        var VALS = [100, 70, 40, 85, 55, 30];
+        var sw = many(6, function (k) { return el("input", { type: "range", value: String(VALS[k]) }); });
+        along(st, sw, wave(94, 18, 1.5, 0), 2, false);
+      } else {
+        var y = 16;
+        WORDS.forEach(function (w, r) {
+          var row;
+          if (r < 3) row = w.split("").map(function (ch) { return tile(ch, false); });
+          else {
+            var start = r === 3 ? 0 : FIRST.length + 1, nm = names[r - 3];
+            row = nm.split("").map(function (ch, k) { return tile(ch, DIFF[start + k]); });
+            if (r === 4) row.push(tile("?", false));
+          }
+          along(st, row, wave(y, 6, 1, r % 2 ? Math.PI : 0), 2, false);
+          y += 34;
+        });
+      }
       return function (f) {
         var n = step(f, pending.length + 1);
         pending.forEach(function (p, k) { p.e.textContent = k < n ? p.ch : "\uFFFD"; });
@@ -190,8 +217,10 @@
         y += ta.offsetHeight + 4;
       });
       var whiskers = many(6, function () { return el("progress", { max: "1", value: "0" }); });
+      var room = Math.floor((view().w - 16 - mid.offsetWidth - 32) / 2);
       whiskers.forEach(function (p, k) {
         p.style.position = "absolute"; st.appendChild(p);
+        if (room < p.offsetWidth) p.style.width = Math.max(40, room) + "px";
         var side = k < 3 ? -1 : 1, row = k % 3;
         var cx = W / 2 + side * (mid.offsetWidth / 2 + p.offsetWidth / 2 + 16);
         p.style.left = Math.round(cx - p.offsetWidth / 2) + "px";
@@ -215,26 +244,31 @@
 
     { h: 150, draw: function (st, W, H) {
       var sels = WORDS.map(function (w) { var s = el("select"); s.appendChild(el("option", {}, [w])); return s; });
-      var y = 0;
+      var y = 0, widest = 0;
       sels.forEach(function (s) {
         s.style.position = "absolute"; st.appendChild(s);
         s.style.left = Math.round((W - s.offsetWidth) / 2) + "px";
         s.style.top = y + "px";
         y += s.offsetHeight + 2;
+        widest = Math.max(widest, s.offsetWidth);
       });
+      var GAP = 6, probe = el("input", { type: "range" });
+      st.appendChild(probe);
+      var rw = Math.min(probe.offsetWidth, Math.floor((view().w - 16 - widest - 2 * GAP) / 2));
+      st.removeChild(probe);
       var ribs = [];
       sels.forEach(function (s, k) {
         [-1, 1].forEach(function (side) {
-          var p = el("progress", { max: "1", value: "0" });
-          p.style.position = "absolute"; st.appendChild(p);
-          var cx = W / 2 + side * (s.offsetWidth / 2 + p.offsetWidth / 2 + 8);
-          p.style.left = Math.round(cx - p.offsetWidth / 2) + "px";
-          p.style.top = Math.round(s.offsetTop + (s.offsetHeight - p.offsetHeight) / 2) + "px";
-          p.style.transform = "rotate(" + (side * (k - 2) * 8) + "deg)" + (side < 0 ? " scaleX(-1)" : "");
-          ribs.push(p);
+          var r = el("input", { type: "range", min: "0", max: "1000", value: "0" });
+          r.style.position = "absolute"; r.style.width = rw + "px"; st.appendChild(r);
+          var x = side < 0 ? s.offsetLeft - GAP - r.offsetWidth : s.offsetLeft + s.offsetWidth + GAP;
+          r.style.left = x + "px";
+          r.style.top = Math.round(s.offsetTop + (s.offsetHeight - r.offsetHeight) / 2) + "px";
+          if (side < 0) r.style.transform = "scaleX(-1)";
+          ribs.push(r);
         });
       });
-      return function (f) { ribs.forEach(function (p) { p.value = f; }); };
+      return function (f) { var v = String(Math.round(f * 1000)); ribs.forEach(function (r) { r.value = v; }); };
     } }
   ];
 
@@ -249,17 +283,22 @@
     css.textContent =
       "#doyoumean{position:fixed;left:0;top:0;width:0;height:0;overflow:visible;z-index:2147483647;pointer-events:none;" +
       "font-family:'Times New Roman',Times,serif;font-size:medium;-webkit-text-size-adjust:100%;text-size-adjust:100%}" +
-      "#doyoumean>div{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:auto;cursor:pointer}" +
+      "#doyoumean>div{position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer}#doyoumean>div>div{transform-origin:0 0}" +
       "#doyoumean *{font-family:inherit;font-size:inherit;white-space:nowrap}";
     document.head.appendChild(css);
 
     var layer = el("div", { id: "doyoumean" });
     var ask = ASK[here];
     var W = ask.w || 640, H = ask.h;
+    if (ask.narrow && view().w - 16 < W) { W = ask.narrow.w; H = ask.narrow.h; }
+    var wrap = el("div");
     var stage = el("div");
+    stage.style.position = "absolute"; stage.style.left = "0"; stage.style.top = "0";
     stage.style.width = W + "px";
     stage.style.height = H + "px";
-    layer.appendChild(stage);
+    wrap.appendChild(stage);
+    layer.appendChild(wrap);
+    var ZOOM = "zoom" in stage.style;
     document.body.appendChild(layer);
     stage.addEventListener("click", function (e) { e.preventDefault(); go(); });
 
@@ -280,8 +319,12 @@
       var s = Math.min(1, (v.w - 16) / bw, (v.h * 0.6) / bh);
       var x = v.x + (v.w - bw * s) / 2 - bx * s;
       var y = v.y + v.h - BOTTOM - by2 * s;
-      var t = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) scale(" + s.toFixed(4) + ")";
-      if (t !== last) { stage.style.transform = t; last = t; }
+      var t = Math.round(x) + "," + Math.round(y) + "," + s.toFixed(3);
+      if (t === last) return;
+      last = t;
+      wrap.style.transform = "translate(" + Math.round(x) + "px," + Math.round(y) + "px)";
+      if (ZOOM) stage.style.zoom = s.toFixed(3);
+      else stage.style.transform = "scale(" + s.toFixed(3) + ")";
     }
     (function loop() {
       place();
