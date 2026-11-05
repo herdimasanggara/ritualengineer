@@ -1,6 +1,6 @@
 (function () {
-  var CYCLE = 10000;
-  var SHOW_AT = 5000;
+  var CYCLE = 30000;
+  var SHOW_AT = 15000;
   var BOTTOM = 24;
 
   var PAGES = [
@@ -19,9 +19,10 @@
   var here = 0;
   for (var i = 0; i < PAGES.length; i++) {
     var slug = PAGES[i].url.split("/").pop();
-    if (PAGES[i].file === last || (slug === last && location.hostname === PAGES[i].url.split("/")[2])) here = i;
+    if (PAGES[i].file === last || slug.toLowerCase() === last) here = i;
   }
   var there = (here + 1) % PAGES.length;
+  try { console.log("doyoumean: here=" + here + " next=" + PAGES[there].url); } catch (e) {}
 
   function urlFor(p) { return local ? p.file + ".html" : p.url; }
   var NEXT = urlFor(PAGES[there]);
