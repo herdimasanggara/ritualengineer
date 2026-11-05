@@ -4,7 +4,7 @@
   var BOTTOM = 24;
 
   var PAGES = [
-    { url: "https://webresidencies.akademie-solitude.de/racun", file: "index", name: "Herdimas Anggara"  },
+    { url: "https://ritual.engineer/",                            file: "index", name: "Herdimas Anggara"  },
     { url: "https://ritual.engineer/herdimasangarra",            file: "rucan", name: "Herdimas Angarra"  },
     { url: "https://ritual.engineer/herdimasanggarra",           file: "carun", name: "Herdimas Anggarra" },
     { url: "https://ritual.engineer/herdinasanggara",            file: "curan", name: "Herdinas Anggara"  },
